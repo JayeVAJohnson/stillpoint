@@ -264,21 +264,53 @@ async function initTodo() {
     reader.onload = async ev => {
       const text = ev.target.result;
       const isCsv = file.name.endsWith('.csv');
-      let lines;
+      const rawLines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      let newTasks;
       if (isCsv) {
-        lines = text.split('\n').map(l => l.replace(/^"|"$/g, '').trim()).filter(Boolean);
-        // skip header if looks like one
-        if (lines[0] && lines[0].toLowerCase().includes('task')) lines.shift();
+        let rows = rawLines.map(parseCsvLine);
+        // skip header if first cell looks like "Task"
+        if (rows[0] && rows[0][0] && rows[0][0].toLowerCase().includes('task')) rows.shift();
+        newTasks = rows
+          .filter(cols => cols[0])
+          .map(cols => ({ id: uid(), text: cols[0], done: (cols[1] || '').trim().toLowerCase() === 'yes' }));
       } else {
-        lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        newTasks = rawLines.map(line => {
+          const m = line.match(/^\[(x| )\]\s*(.*)$/i);
+          if (m) return { id: uid(), text: m[2], done: m[1].toLowerCase() === 'x' };
+          return { id: uid(), text: line, done: false };
+        });
       }
-      const newTasks = lines.map(text => ({ id: uid(), text, done: false }));
+      newTasks = newTasks.filter(t => t.text);
       todos = [...todos, ...newTasks];
       await saveTodos(); renderTodos();
       e.target.value = '';
     };
     reader.readAsText(file);
   });
+}
+
+// Parses a single CSV line into an array of unescaped field values.
+// Handles quoted fields, embedded commas, and "" as an escaped quote.
+function parseCsvLine(line) {
+  const fields = [];
+  let cur = '', inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        cur += ch;
+      }
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ',') { fields.push(cur); cur = ''; }
+      else cur += ch;
+    }
+  }
+  fields.push(cur);
+  return fields.map(f => f.trim());
 }
 
 function uid() { return Math.random().toString(36).slice(2, 10); }
