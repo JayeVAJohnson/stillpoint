@@ -4,6 +4,8 @@ A calm, organized new tab. Pomodoro timer, to-do list, notepad, habit tracker, a
 
 > *"At the still point of the turning world."* — a quiet anchor for your day, every time you open a tab.
 
+**[→ Try the live demo](https://JayeVAJohnson.github.io/stillpoint/)**
+
 ---
 
 ## Choose how you want to use it
