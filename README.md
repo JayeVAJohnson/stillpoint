@@ -1,6 +1,6 @@
 # StillPoint
 
-A calm, organized new tab. Pomodoro timer, to-do list, notepad, habit tracker, and day planner — all offline, no account, no tracking.
+At the stillpoint: a calm, offline-affirming, organized new tab. Pomodoro timer, to-do list, notepad, habit tracker, and day planner.
 
 > *"At the still point of the turning world."* — a quiet anchor for your day, every time you open a tab.
 
