@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StillPoint</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-dusk">
+
+<!-- Settings panel -->
+<div id="settings-panel" class="settings-panel hidden">
+  <div class="settings-inner">
+    <div class="settings-header">
+      <span>Settings</span>
+      <button class="icon-btn" id="close-settings" aria-label="Close settings">✕</button>
+    </div>
+
+    <section class="settings-section">
+      <h3>Theme</h3>
+      <div class="theme-grid">
+        <button class="theme-swatch" data-theme="dusk" title="Dusk"><span class="swatch-preview s-dusk"></span>Dusk</button>
+        <button class="theme-swatch" data-theme="midnight" title="Midnight"><span class="swatch-preview s-midnight"></span>Midnight</button>
+        <button class="theme-swatch" data-theme="forest" title="Forest"><span class="swatch-preview s-forest"></span>Forest</button>
+        <button class="theme-swatch" data-theme="slate" title="Slate"><span class="swatch-preview s-slate"></span>Slate</button>
+        <button class="theme-swatch" data-theme="rose" title="Rose"><span class="swatch-preview s-rose"></span>Rose</button>
+        <button class="theme-swatch" data-theme="light" title="Light"><span class="swatch-preview s-light"></span>Light</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3>Background image</h3>
+      <p class="settings-hint">Replaces the theme colour with your own photo. Stored locally in your browser.</p>
+      <div class="bg-controls">
+        <label class="file-btn" for="bg-upload">Choose image</label>
+        <input type="file" id="bg-upload" accept="image/*" style="display:none">
+        <button id="bg-clear" class="ghost-btn">Remove image</button>
+      </div>
+      <div id="bg-preview-wrap" class="hidden">
+        <img id="bg-preview" alt="Background preview">
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3>Greeting name</h3>
+      <input type="text" id="greeting-name" placeholder="Your name" maxlength="40">
+    </section>
+
+    <section class="settings-section">
+      <h3>Pomodoro lengths</h3>
+      <div class="pomo-settings-row">
+        <label>Focus <input type="number" id="pomo-focus-len" min="1" max="90" value="25"> min</label>
+        <label>Break <input type="number" id="pomo-break-len" min="1" max="30" value="5"> min</label>
+        <label>Long break <input type="number" id="pomo-long-len" min="1" max="60" value="15"> min</label>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3>Habits</h3>
+      <div id="habit-settings-list"></div>
+      <div class="habit-add-row">
+        <input type="text" id="new-habit-name" placeholder="New habit name" maxlength="40">
+        <button id="add-habit-btn" class="ghost-btn">Add</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Gear button -->
+<button class="gear-btn" id="open-settings" aria-label="Open settings">⚙</button>
+
+<!-- Main dashboard -->
+<main class="dashboard">
+
+  <!-- Header -->
+  <header class="dash-header">
+    <div class="header-left">
+      <div id="clock" class="clock">00:00</div>
+      <div id="date-str" class="date-str"></div>
+    </div>
+    <div id="greeting" class="greeting"></div>
+  </header>
+
+  <!-- Widget grid -->
+  <div class="widget-grid">
+
+    <!-- Pomodoro -->
+    <div class="widget widget-pomo" id="w-pomo">
+      <div class="widget-label">Focus timer</div>
+      <div class="pomo-ring-wrap">
+        <svg class="pomo-svg" viewBox="0 0 100 100">
+          <circle class="pomo-track" cx="50" cy="50" r="42"/>
+          <circle class="pomo-progress" id="pomo-arc" cx="50" cy="50" r="42"/>
+        </svg>
+        <div class="pomo-inner">
+          <div id="pomo-display" class="pomo-time">25:00</div>
+          <div id="pomo-label" class="pomo-mode-label">Focus</div>
+        </div>
+      </div>
+      <div class="pomo-session-info">Session <span id="pomo-session">1</span> of 4</div>
+      <div class="pomo-btns">
+        <button id="pomo-toggle" class="pomo-btn">Start</button>
+        <button id="pomo-reset" class="pomo-btn pomo-btn-ghost">Reset</button>
+      </div>
+    </div>
+
+    <!-- To-do -->
+    <div class="widget widget-todo" id="w-todo">
+      <div class="widget-label-row">
+        <span class="widget-label">To-do</span>
+        <div class="todo-actions">
+          <button class="tiny-btn" id="todo-import-btn" title="Import tasks">↑ Import</button>
+          <button class="tiny-btn" id="todo-export-btn" title="Export tasks">↓ Export</button>
+          <input type="file" id="todo-import-file" accept=".txt,.csv" style="display:none">
+          <div class="export-menu hidden" id="export-menu">
+            <button data-fmt="txt">Plain text (.txt)</button>
+            <button data-fmt="csv">CSV (.csv)</button>
+          </div>
+        </div>
+      </div>
+      <ul id="todo-list" class="todo-list"></ul>
+      <div class="todo-add-row">
+        <input type="text" id="todo-input" placeholder="Add a task… (Enter to add)" maxlength="200">
+        <button id="todo-add" class="icon-add-btn" aria-label="Add task">+</button>
+      </div>
+      <div class="todo-footer">
+        <span id="todo-count" class="todo-count"></span>
+        <button class="tiny-btn" id="todo-clear-done">Clear done</button>
+      </div>
+    </div>
+
+    <!-- Notepad -->
+    <div class="widget widget-notepad" id="w-notepad">
+      <div class="widget-label">Notepad</div>
+      <textarea id="notepad-area" placeholder="Scratch space — thoughts, links, anything. Auto-saved."></textarea>
+    </div>
+
+    <!-- Habits -->
+    <div class="widget widget-habits" id="w-habits">
+      <div class="widget-label">Habits <span class="widget-sublabel">— this week</span></div>
+      <div id="habit-list" class="habit-list"></div>
+      <div id="habit-empty" class="habit-empty hidden">
+        <span>No habits yet — add some in ⚙ Settings</span>
+      </div>
+    </div>
+
+    <!-- Day planner -->
+    <div class="widget widget-planner" id="w-planner">
+      <div class="widget-label-row">
+        <span class="widget-label">Day planner</span>
+        <div class="planner-view-toggle">
+          <button class="view-btn active" data-view="blocks" id="view-blocks-btn">Time blocks</button>
+          <button class="view-btn" data-view="list" id="view-list-btn">List</button>
+        </div>
+      </div>
+
+      <!-- Time blocks view -->
+      <div id="planner-blocks-view" class="planner-blocks-view">
+        <div id="blocks-list" class="blocks-list"></div>
+        <div class="block-add-row">
+          <input type="time" id="block-start" class="time-input">
+          <span class="block-dash">→</span>
+          <input type="time" id="block-end" class="time-input">
+          <input type="text" id="block-label" placeholder="Entry" class="block-label-input" maxlength="80">
+          <button id="block-add-btn" class="icon-add-btn" aria-label="Add block">+</button>
+        </div>
+      </div>
+
+      <!-- List view -->
+      <div id="planner-list-view" class="planner-list-view hidden">
+        <ul id="planner-list" class="planner-list"></ul>
+        <div class="plan-add-row">
+          <input type="time" id="plan-time" class="time-input plan-time-opt">
+          <input type="text" id="plan-item-input" placeholder="Add item… (optional time above)" maxlength="200">
+          <button id="plan-item-add" class="icon-add-btn" aria-label="Add item">+</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
