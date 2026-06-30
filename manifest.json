@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "StillPoint",
+  "version": "1.0.0",
+  "description": "A calm, organized new tab. To-do, habits, pomodoro, planner, notepad — offline, no account, no tracking.",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  }
+}
